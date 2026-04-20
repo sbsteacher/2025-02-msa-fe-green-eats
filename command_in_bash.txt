@@ -1,0 +1,159 @@
+# 1. 프로젝트 폴더 생성 및 이동
+mkdir green-eats-fe
+cd green-eats-fe
+
+# 2. 필수 폴더 구조 생성
+mkdir -p src/api src/stores src/views
+
+# 3. package.json 생성
+cat <<EOF > package.json
+{
+  "name": "green-eats-fe",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "pinia": "^2.1.0",
+    "vue": "^3.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.4.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5",
+    "vite": "^4.5.0"
+  }
+}
+EOF
+
+# 4. vite.config.js 생성 (MSA 게이트웨이 프록시 설정 포함)
+cat <<EOF > vite.config.js
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [vue()],
+  resolve: {
+    alias: { '@': path.resolve(__dirname, './src') }
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8000', // 강사님의 API Gateway 주소
+        changeOrigin: true
+      }
+    }
+  }
+})
+EOF
+
+# 5. Pinia Store 생성 (TSID 대응)
+cat <<EOF > src/stores/useOrderStore.js
+import { defineStore } from 'pinia'
+import axios from 'axios'
+
+export const useOrderStore = defineStore('order', {
+  state: () => ({
+    menus: []
+  }),
+  actions: {
+    async fetchMenus() {
+      try {
+        const res = await axios.get('/api/stores/menus')
+        this.menus = res.data
+      } catch (err) {
+        console.error('메뉴 로드 실패', err)
+      }
+    },
+    async placeOrder(menuId, count) {
+      try {
+        // TSID는 매우 큰 숫자이므로 문자열로 확실히 변환하여 전송
+        await axios.post('/api/orders', { 
+          menuId: String(menuId), 
+          count: count 
+        })
+        alert('주문이 성공적으로 완료되었습니다!')
+        await this.fetchMenus() // 재고 갱신을 위해 다시 로드
+      } catch (err) {
+        alert('주문 실패: ' + (err.response?.data?.message || '서버 오류'))
+      }
+    }
+  }
+})
+EOF
+
+# 6. 메인 뷰 컴포넌트 생성
+cat <<EOF > src/views/OrderPage.vue
+<template>
+  <div style="padding: 20px; font-family: sans-serif;">
+    <h1 style="color: #2c3e50;">Green-Eats 메뉴판 (MSA 예제)</h1>
+    <hr />
+    <div v-if="store.menus.length === 0">메뉴를 불러오는 중이거나 메뉴가 없습니다.</div>
+    <div v-for="menu in store.menus" :key="menu.id" 
+         style="border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px;">
+      <h3>{{ menu.name }}</h3>
+      <p>가격: {{ menu.price }}원</p>
+      <p>잔여 재고: <strong>{{ menu.stockQuantity }}</strong>개</p>
+      <button @click="store.placeOrder(menu.id, 1)"
+              :disabled="menu.stockQuantity <= 0"
+              style="background-color: #42b983; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+        {{ menu.stockQuantity > 0 ? '지금 주문하기' : '품절' }}
+      </button>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useOrderStore } from '@/stores/useOrderStore'
+import { onMounted } from 'vue'
+
+const store = useOrderStore()
+
+onMounted(() => {
+  store.fetchMenus()
+})
+</script>
+EOF
+
+# 7. 기본 App.vue 및 main.js 생성
+cat <<EOF > src/App.vue
+<template>
+  <OrderPage />
+</template>
+<script setup>
+import OrderPage from './views/OrderPage.vue'
+</script>
+EOF
+
+cat <<EOF > src/main.js
+import { createApp } from 'vue'
+import { createPinia } from 'pinia'
+import App from './App.vue'
+
+const app = createApp(App)
+app.use(createPinia())
+app.mount('#app')
+EOF
+
+# 8. index.html 생성
+cat <<EOF > index.html
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Green-Eats FE</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+EOF
+
+echo "✅ 프로젝트 생성 완료! 'cd green-eats-fe' 이동 후 'npm install && npm run dev'를 실행하세요."
