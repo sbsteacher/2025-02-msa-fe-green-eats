@@ -1,10 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
 import { getMenuList } from '@/api/storeService';
 import { useCartStore } from '@/stores/cart';
 
-const router = useRouter();
 const menus = ref([]);
 const cartStore = useCartStore();
 
@@ -12,19 +10,6 @@ const cartStore = useCartStore();
 const fetchMenus = async () => {    
     const res = await getMenuList();
     menus.value = res.resultData;
-};
-
-// 주문 화면으로 이동
-const goToOrder = async menu => {
-    console.log('menu: ', menu);
-    const selectedMenu = { 
-        menuId: menu.id,
-        name: menu.name,
-        price: menu.price,
-        stockQuantity: menu.stockQuantity
-    }
-    orderMenuStore.setOrderMenu(selectedMenu);
-    router.push('/order');
 };
 
 onMounted(fetchMenus);

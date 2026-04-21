@@ -3,6 +3,7 @@ import SignIn from '@/views/Signin.vue';
 import Home from '@/views/Home.vue';
 import Order from '@/views/Order.vue';
 import OrderList from '@/views/OrderList.vue';
+import OrderDetail from '@/views/OrderDetail.vue';
 
 import { useAuthenticationStore } from '@/stores/authentication';
 import { useMessageModalStore } from '@/stores/messageModal';
@@ -16,7 +17,8 @@ const router = createRouter({
     { path: '/signup', component: () => import('@/views/Signup.vue') },
     { path: '/menu/add', component: () => import('@/views/MenuAdd.vue') },
     { path: '/order', component: Order },
-    { path: '/orderlist', component: OrderList },
+    { path: '/order/list', component: OrderList },
+    { path: '/order/:orderId', name: 'OrderDetail', component: OrderDetail, props: true },
   ],
 });
 

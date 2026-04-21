@@ -16,6 +16,7 @@ const authenticationStore = useAuthenticationStore();
       <template v-else>
         <a href="#" @click="authenticationStore.authSignout()">로그아웃</a>
         <router-link to="/menu/add">메뉴등록</router-link>
+        <router-link to="/order/list">주문조회</router-link>
       </template>
     </header>
     <main>
