@@ -6,7 +6,6 @@ import { postMenu, getCodeList } from '@/api/storeService';
 
 const router = useRouter();
 
-
 const state = reactive({
   menu: {
     name: '',

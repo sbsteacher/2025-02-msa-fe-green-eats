@@ -21,3 +21,8 @@ export const reissue = async () => {
     const res = await axios.post(`${path}/reissue`);
     return res.data;
 };
+
+export const getCodeList = async params => {
+    const res = await axios.get(`${path}/code`, { params });
+    return res.data;
+}

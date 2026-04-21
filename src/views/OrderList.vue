@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import getMenuList from '@/api/storeService'; // axios 인터셉터가 포함된 인스턴스
+
 
 const orders = ref([]);
 

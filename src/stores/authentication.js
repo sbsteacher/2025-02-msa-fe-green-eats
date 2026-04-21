@@ -26,7 +26,7 @@ export const useAuthenticationStore = defineStore(
             const res = await signout();
             state.isSigned = false;
             state.signedUser = null;            
-            await router.push('/sign-in')
+            await router.push('/')
         }
 
         return { state, authSignin, authSignout };

@@ -1,80 +1,47 @@
 <script setup>
-import { reactive, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useOrderMenuStore } from '../stores/orderMenuStore';
-import { placeOrder } from '@/api/orderService';
+import { useCartStore } from '@/stores/cart';
+import { useOrder } from '@/composables/useOrder'; // 컴포저블 임포트
 
-const router = useRouter();
-const orderMenuStore = useOrderMenuStore();
+// 1. 상태 스토어 가져오기
+const cartStore = useCartStore();
 
-const state = reactive({
-  selectedMenu: {
-    name: '',
-    price: 0,
-    stockQuantity: 0
-  },
-  order: {
-    menuId: 0,
-    price: 0,
-    quantity: 1
-  },
-  loading: false
-})
+// 2. 비즈니스 로직(Composable) 주입받기
+const { isSubmitting, submitOrder } = useOrder();
 
-onMounted(() => {
-  console.log('orderMenuStore.state.selectedMenu: ', orderMenuStore.state.selectedMenu);
-  state.selectedMenu = orderMenuStore.state.selectedMenu;
-  state.order.menuId = state.selectedMenu.menuId;
-  state.order.price = state.selectedMenu.price;
-});
-
-const validateQuantity = () => {
-  if (state.order.quantity < 1) { state.order.quantity = 1; }
-  else if(state.order.quantity > state.selectedMenu.stockQuantity) { state.order.quantity = state.selectedMenu.stockQuantity; }
-
-  state.order.price = state.order.quantity * state.selectedMenu.price;
+// 필요하다면 컴포넌트 내에서 추가 핸들링 가능
+const handleOrder = () => {
+  submitOrder();
 };
-
-const submitOrder = async () => {
-  state.loading = true;
-  const params = {
-    items: []
-  }
-  params.items.push(state.order);
-  await placeOrder(params);
-  orderMenuStore.clearOrder(); // 주문 완료 후 스토어 비우기
-  router.push('/'); // 홈으로 이동
-  
-};
-
 </script>
+
 <template>
-  <div class="container" v-if="state.selectedMenu">
-    <h2>주문 확인</h2>
-    <div class="order-detail">
-      <h3>{{ state.selectedMenu.name }}</h3>
-      <p>단가: {{ state.selectedMenu.price.toLocaleString() }}원</p>
-      
-      <div class="quantity-control">
-        <label>수량: </label>
-        <input type="number" v-model.number="state.order.quantity" min="1" @input="validateQuantity" />
+  <div class="order-container">
+    <h2>📦 주문 확인서 (Composition API)</h2>
+    
+    <div v-if="cartStore.state.items.length === 0" class="empty-cart">
+      <p>담긴 상품이 없습니다.</p>
+      <button @click="$router.push('/')">메뉴 보러가기</button>
+    </div>
+    
+    <div v-else>
+      <div v-for="item in cartStore.state.items" :key="item.menuId" class="order-item">
+        <div class="info">
+          <strong>{{ item.name }}</strong>
+          <span>{{ item.price.toLocaleString() }}원</span>
+        </div>
+        <div class="controls">
+          <input type="number" v-model.number="item.quantity" min="1" />
+          <button @click="cartStore.removeItem(item.menuId)">삭제</button>
+        </div>
       </div>
 
-      <hr />
       <div class="total-section">
-        <span>총 주문 금액: </span>
-        <span class="total-price">{{ state.order.price.toLocaleString() }}원</span>
+        <h3>최종 결제 금액: {{ cartStore.totalAmount.toLocaleString() }}원</h3>
+        <button class="order-btn" @click="handleOrder" :disabled="isSubmitting">
+          {{ isSubmitting ? '주문 처리 중...' : '한번에 주문하기' }}
+        </button>
       </div>
-
-      <button class="order-btn" @click="submitOrder" :disabled="state.loading">
-        {{ state.loading ? '주문 중...' : '결제 및 주문하기' }}
-      </button>
     </div>
   </div>
-  <div v-else class="error">
-    <p>선택된 메뉴가 없습니다.</p>
-    <button @click="$router.push('/')">메뉴판으로 돌아가기</button>
-  </div>
 </template>
-
 

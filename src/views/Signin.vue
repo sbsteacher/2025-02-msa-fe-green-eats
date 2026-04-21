@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useAuthenticationStore } from '@/stores/authentication';
 import { useRouter } from 'vue-router';
 
-const email = ref('mic@naver.com');
+const email = ref('mic8@gmail.com');
 const password = ref('1212');
 const authentication = useAuthenticationStore();
 const router = useRouter();
