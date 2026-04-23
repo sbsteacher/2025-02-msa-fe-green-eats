@@ -2,8 +2,6 @@
 import { useAuthenticationStore } from '@/stores/authentication';
 
 const authenticationStore = useAuthenticationStore();
-
-
 </script>
 <template>
   <div>

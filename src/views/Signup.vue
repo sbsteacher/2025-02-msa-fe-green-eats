@@ -92,7 +92,7 @@ onMounted(async () => {
 
         <p v-if="passwordError" class="error-msg">{{ passwordError }}</p>
 
-        <button type="submit" :disabled="isSubmitting">회원가입</button>
+        <button type="submit" :disabled="state.isSubmitting">회원가입</button>
         </form>
         
         <div class="link-section">

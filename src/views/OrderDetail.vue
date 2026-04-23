@@ -1,6 +1,5 @@
 <script setup>
 import { reactive, onMounted } from 'vue';
-import axios from 'axios';
 import { getOrderDetail } from '@/api/orderService';
 
 const props = defineProps({
@@ -9,7 +8,6 @@ const props = defineProps({
         required: true
     }
 });
-
 
 const state = reactive({
     detailList: [] 
@@ -33,7 +31,7 @@ onMounted(async () => {
         <div v-for="detail in state.detailList" :key="detail.id">
             <p>메뉴명: {{ detail.name }}</p>
             <p>가격: {{ detail.price.toLocaleString() }}원</p>
-            <p>메뉴명: {{ detail.quantity }}</p>            
+            <p>수량: {{ detail.quantity }}</p>            
         </div>
     </div>
 </template>
