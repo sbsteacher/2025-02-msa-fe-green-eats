@@ -3,7 +3,7 @@ import { reissue } from '@/api/userService';
 import { useAuthenticationStore } from '@/stores/authentication';
 import { useMessageModalStore } from '@/stores/messageModal';
 
-axios.defaults.baseURL = 'http://localhost:8000/api/';
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
 axios.defaults.withCredentials = true;
 
 //인터셉터
