@@ -28,7 +28,7 @@ spec:
   volumes:
     - name: harbor-token
       secret:
-        secretName: harbor-secret // Harbor 로그인 정보가 담긴 K8s Secret
+        secretName: "harbor-secret" // Harbor 로그인 정보가 담긴 K8s Secret
         items:
           - key: .dockerconfigjson
             path: config.json
