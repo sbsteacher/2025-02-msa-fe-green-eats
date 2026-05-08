@@ -8,9 +8,16 @@ kind: Pod
 spec:
   containers:
   - name: node
-    image: node:21-alpine
+    image: node:22.12.0-alpine
     command: ["cat"]
     tty: true
+    resources:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
   - name: kaniko
     image: gcr.io/kaniko-project/executor:debug
     command: ["sleep"]
