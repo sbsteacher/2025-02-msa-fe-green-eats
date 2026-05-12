@@ -39,7 +39,7 @@ spec:
     environment {
         // Harbor 정보 (강사님 환경에 맞춰 수정)
         REGISTRY = "harbor.greenart.n-e.kr"
-        PROJECT = "green-eats"
+        PROJECT = "momoolggo"
         IMAGE_NAME = "vue-fe"
     }
 
